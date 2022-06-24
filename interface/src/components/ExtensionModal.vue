@@ -10,7 +10,9 @@
           <b-form-input :name="proposal.params_names[j]" v-if="type === 'address'"></b-form-input>
           <b-form-input :name="proposal.params_names[j]" v-else-if="type === 'uint256'" type="number"></b-form-input>
         </div>
-        <b-button style="margin-top: 20px" variant="outline-primary">Create Proposal</b-button>
+        <div style="text-align: center" class="mt-3">
+          <button class="outline">Create Proposal</button>
+        </div>
 
       </b-form>
 
@@ -24,13 +26,15 @@
 </template>
 
 <script>
+const extABI = require("../../../artifacts/contracts/Extensions/IExtension.sol/IExtension.json");
 export default {
   name: "ExtensionModal",
-  props: ['address', 'web3', 'extensionABI', 'extension'],
+  props: ['address', 'web3', 'extension'],
   data() {
     return {
       extensionContract: undefined,
-      proposals: []
+      proposals: [],
+      extensionABI: extABI.abi
     }
   },
 

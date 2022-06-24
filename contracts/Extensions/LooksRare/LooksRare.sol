@@ -1,5 +1,5 @@
 pragma solidity ^0.8.4;
-import "../ExtensionInterfaces.sol";
+import "../IExtension.sol";
 import "../IProposal.sol";
 import "./LooksRareBuyout.sol";
 import "./LooksRareListing.sol";

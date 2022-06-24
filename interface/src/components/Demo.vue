@@ -1,57 +1,52 @@
 <template>
   <b-container fluid>
-<!--        <Logo/>-->
-    <a href="#" @click="connect">{{ address === undefined ? "Connect" : address }}</a><br><br>
-    <!-- Balances are stored and processed in 1/(10^18) of currency since Ethereum doesn't support float numbers -->
-    <!-- Here we use web3.utils.fromWei to format Wei balance (1/(10^18) of currency) to pretty numbers  -->
-    <div>ETH balance: {{ web3.utils.fromWei(balance) }}</div>
+    <a href="#" v-if="!address" @click="connect">Connect Metamask</a>
+    <div v-else>
+      <b-row class="pt-4 pb-4" style="background-color: #263238; color: white;">
+        <b-col style="text-align: left; padding-left: 20px">
+          <img src="../assets/logo.svg" style="height: 3em"/>
+        </b-col>
+        <b-col style="text-align: right; padding-right: 20px; padding-top: 0.8em">
+          <div>
+            <a href="#" @click="connect" style="color: white; font-weight: bold; text-decoration: none;">{{ address.slice(0, 7) }}...{{ address.slice(address.length-5) }}</a>
+<!--            <img src="https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@bea1a9722a8c63169dcc06e86182bf2c55a76bbc/svg/icon/eth.svg"/>-->
+<!--            {{ web3.utils.fromWei(balance).split(".")[0] }}.{{ web3.utils.fromWei(balance).split(".")[1].slice(0, 2) }}-->
+          </div>
+        </b-col>
+      </b-row>
+
+      <!--        <Logo/>-->
+
+      <Crowd :address="address" :web3="web3" />
+
+      <b-row v-if="crowd">
+        <b-col>
+          <button href="#" v-b-toggle.vault-collapse class="outline mt-5 mb-3">Vault</button>
+          <b-collapse id="vault-collapse" class="mt-2">
+            <Vault :address="address" :web3="web3" />
+          </b-collapse>
+        </b-col>
+      </b-row>
+
+      <b-row v-if="crowd">
+        <b-col>
+          <button href="#" v-b-toggle.extensions-collapse class="outline mt-5 mb-3">Extensions</button>
+          <b-collapse id="extensions-collapse" class="mt-2">
+            <Extensions :address="address" :web3="web3" />
+          </b-collapse>
+        </b-col>
+      </b-row>
 
 
-    <h3>Extension Manager</h3><br>
-    <input v-model="extensionManagerAddress" style="width: 30vw" placeholder="ExtensionManager address">
-    <b-button @click="setExtensionManager" style="margin-left: 10px;">Update</b-button>
-    <br><br>
-
-    <input v-model="newExtensionAddress" style="width: 30vw" placeholder="New extension address">
-    <b-button @click="registerExtension" style="margin-left: 10px;">Register</b-button>
-    <br><br>
-
-    Extensions Total: {{ extensionsTotal }}<br>
-    Extensions:<br>
-    <b-row>
-      <b-col xs="12">
-        <div v-for="ext_row in parseInt((extensions.length/5).toFixed())+1" :key="ext_row">
-          <b-card-group deck class="d-flex">
-            <b-card border-variant="info" style="max-width: 20vw; margin: 5px;" :header="ext.name" align="center" v-for="ext in extensions.slice((ext_row-1)*5, ext_row*5)" :key="ext.id">
-              <b-card-text style="text-align: left">
-                id: {{ ext.id }}<br/>
-                Address: <a href="#">{{ ext.extension_address.slice(0, 7) }}...{{ ext.extension_address.slice(ext.extension_address.length-5) }}</a><br/>
-                Proposals: {{ ext.proposals_count }}<br/>
-                Workers: {{ ext.workers_count }}<br/>
-              </b-card-text>
-<!--              <b-button :v-b-modal="`ext-modal-${ext.id}`">Launch</b-button>-->
-              <b-button v-b-modal="`ext-modal-${ext.id}`">Launch</b-button>
-              <ExtensionModal
-                  :address="address"
-                  :web3="web3"
-                  :extensionABI="extensionABI"
-                  :extension="ext"
-              />
-            </b-card>
-          </b-card-group>
-        </div>
-      </b-col>
-    </b-row>
-
-
-    <!-- Here we'll display all DAI transfer transactions during the session -->
-    <!-- With a nice link to block explorer, where we'll be able to discover the receipt -->
-    <h3>Transactions:</h3><br>
-    <div v-for="tx in sessionTxs" v-bind:key="tx.transactionHash">
-      <a :href="`https://rinkeby.etherscan.io/tx/${tx.transactionHash}`"
-         target="_blank">
-        {{ tx.transactionHash }}
-      </a>
+      <!-- Here we'll display all DAI transfer transactions during the session -->
+      <!-- With a nice link to block explorer, where we'll be able to discover the receipt -->
+<!--      <h3>Transactions:</h3><br>-->
+<!--      <div v-for="tx in sessionTxs" v-bind:key="tx.transactionHash">-->
+<!--        <a :href="`https://rinkeby.etherscan.io/tx/${tx.transactionHash}`"-->
+<!--           target="_blank">-->
+<!--          {{ tx.transactionHash }}-->
+<!--        </a>-->
+<!--      </div>-->
     </div>
   </b-container>
 </template>
@@ -59,12 +54,12 @@
 <script>
 import Web3 from "web3"
 // import Logo from "./Logo";
-import ExtensionModal from "./ExtensionModal";
-const emABI = require("../../../artifacts/contracts/ExtensionManager.sol/ExtensionManager.json");
-const extABI = require("../../../artifacts/contracts/ExtensionInterfaces.sol/IExtension.json");
+import Vault from "./Vault";
+import Extensions from "./Extensions";
+import Crowd from "./Crowd";
 export default {
   name: 'Demo',
-  components: {ExtensionModal},
+  components: {Crowd, Extensions, Vault},
   props: {
     msg: String
   },
@@ -72,20 +67,12 @@ export default {
   data() {
     return {
       web3: undefined,
-
       address: undefined,
       balance: "",
 
-      // Setup
-      extensionManagerAddress: "0xD034e186Cce07B9c20595Db343b7618eB938F78E",
-      extensionManager: undefined,
-      newExtensionAddress: "",
-      extensionsTotal: undefined,
-      extensions: [],
+      crowd: undefined,
 
       sessionTxs: [],
-
-      extensionABI: extABI.abi
     }
   },
 
@@ -109,57 +96,16 @@ export default {
         params: [{chainId: '0x539'}], // Ganache network
       });
 
-      await this.getBalanceEth()
+      await this.getBalanceEth();
     },
 
     async getBalanceEth() {
       this.balance = await this.web3.eth.getBalance(this.address)
     },
-
-    async setExtensionManager() {
-      this.extensionManager = new this.web3.eth.Contract(emABI.abi, this.extensionManagerAddress)
-      await this.getExtensionsCount()
-      await this.getExtensions()
-    },
-
-    async getExtensionsCount() {
-      if (this.extensionManager) {
-        this.extensionsTotal = await this.extensionManager.methods.extensions_total().call()
-      }
-    },
-
-    async registerExtension() {
-      const tx = await this.extensionManager.methods.registerModule(this.newExtensionAddress).send({
-        from: this.address,
-        value: "0"
-      })
-      this.sessionTxs.push(tx)
-      await this.getExtensionsCount()
-      await this.getExtensions()
-    },
-
-    async getExtensions() {
-      for (let i = 0; i < this.extensionsTotal; i++) {
-        console.log("HERE", i)
-        this.extensions.push(await this.extensionManager.methods.getExtension(i).call());
-      }
-    },
-
-    // async getDaiBalance() {
-    //   this.daiBalance = await this.daiContract.methods.balanceOf(this.address).call({ from: this.address })
-    // },
-    //
-    // async transferDai() {
-    //   const amount = this.web3.utils.toWei(this.daiAmountToSend, 'ether');
-    //   const tx = await this.daiContract.methods.transfer(this.daiRecipient, amount).send({ from: this.address, value: "0" })
-    //   this.sessionTxs.push(tx)
-    //   console.log(this.sessionTxs)
-    // }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;
@@ -173,9 +119,5 @@ ul {
 li {
   display: inline-block;
   margin: 0 10px;
-}
-
-a {
-  color: #42b983;
 }
 </style>
