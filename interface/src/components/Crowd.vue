@@ -4,7 +4,7 @@
       <h3>
         <span v-if="crowd">Crowd</span>
         <span id="popover-switch-crowd" style="cursor: pointer;">
-          <span class="gradient-text" v-if="crowd">{{ crowd.title }}</span>
+          <span class="gradient-text" v-if="crowd"> {{ crowd.title }}</span>
           <span class="gradient-text" v-else>Choose Crowd</span>
           <b-icon-arrow-left-right style="margin-left: 10px;"></b-icon-arrow-left-right>
         </span>
@@ -26,7 +26,7 @@
             <b-button class="mt-2 outline" @click="createCrowd">Create</b-button>
           </b-col>
         </b-row>
-        <b-row v-for="option in crowds" :key="option.id" class="crowd-option">
+        <b-row v-for="option in crowds" :key="option.id" class="crowd-option" @click="switchCrowd(option)">
           <b-col>
               {{ option.id}}.
               <h5 class="crowd-title"
@@ -45,7 +45,7 @@
 
 <script>
 const contractsAt = require("../../../addresses.json");
-const crowdABI = require("../../../artifacts/contracts/Crowd.sol/Crowd.json");
+const crowdABI = require("../../../artifacts/contracts/CrowdManager.sol/CrowdManager.json");
 export default {
   name: "Crowd",
   props: ['address', 'web3'],
@@ -89,6 +89,11 @@ export default {
         value: "0"
       })
       await this.getCrowdsBunch()
+    },
+
+    async switchCrowd(option) {
+      this.crowd = option;
+      this.$emit("crowd-changed", option)
     }
 
   }
@@ -104,26 +109,20 @@ export default {
   .crowd-option {
     cursor: pointer;
     text-align: left;
-    margin-top: 10px;
+    margin-top: 20px;
     padding-top: 5px;
     padding-bottom: 5px;
     border-radius: 0.5em;
-    background: transparent;
+    border: 1px solid transparent;
   }
 
   .crowd-option:hover {
     color: black;
-    background: linear-gradient(90deg, #00F0FF, #FF1CF7);
+    border: 1px solid white;
   }
 
   .crowd-option .crowd-title {
     background: linear-gradient(90deg, #00F0FF, #FF1CF7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .crowd-option:hover .crowd-title {
-    background: #263238;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

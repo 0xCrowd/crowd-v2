@@ -11,6 +11,7 @@ contract CrowdManager {
         uint256 id;
         string  title;
         address extensionManager;
+        CrowdVault vault;
         address creator;
     }
 
@@ -33,7 +34,8 @@ contract CrowdManager {
     function newCrowd(string memory title, address extension_manager) public {
         require(title_to_crowd[title].id == 0, "Crowd: Crowd with that title already exists");
         total_crowds++;
-        Crowd memory crowd = Crowd(total_crowds, title, extension_manager, msg.sender);
+        CrowdVault vault = new CrowdVault(extension_manager);
+        Crowd memory crowd = Crowd(total_crowds, title, extension_manager, vault, msg.sender);
         title_to_crowd[title] = crowd;
         id_to_crowd[total_crowds] = crowd;
     }

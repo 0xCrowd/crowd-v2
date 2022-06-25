@@ -17,7 +17,7 @@
 
       <!--        <Logo/>-->
 
-      <Crowd :address="address" :web3="web3" />
+      <Crowd :address="address" :web3="web3" @crowd-changed="function(option) {crowd = option}" />
 
       <b-row v-if="crowd">
         <b-col>
