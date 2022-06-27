@@ -1,14 +1,20 @@
 <template>
   <div>
     <b-row style="text-align: left" class="p-3">
-      <h3>
-        <span v-if="crowd">Crowd</span>
-        <span id="popover-switch-crowd" style="cursor: pointer;">
-          <span class="gradient-text" v-if="crowd"> {{ crowd.title }}</span>
-          <span class="gradient-text" v-else>Choose Crowd</span>
-          <b-icon-arrow-left-right style="margin-left: 10px;"></b-icon-arrow-left-right>
-        </span>
-      </h3>
+      <div>
+        <h3 style="display: inline-block; width: 50%;">
+          <span id="popover-switch-crowd" style="cursor: pointer;">
+            <span v-if="crowd">Crowd</span>
+            <span class="gradient-text" v-if="crowd"> {{ crowd.title }}</span>
+            <span class="gradient-text" v-else>Choose Crowd</span>
+            <b-icon-arrow-left-right style="margin-left: 10px;"></b-icon-arrow-left-right>
+          </span>
+        </h3>
+        <h5 style="display: inline-block; text-align: right; width: 50%;" v-if="crowd">
+          <a href="#">{{ crowd.vault.slice(0, 7) }}...{{ crowd.vault.slice(crowd.vault.length-5) }}</a>
+        </h5>
+      </div>
+
 
       <b-popover target="popover-switch-crowd"
                  triggers="hover"

@@ -23,7 +23,7 @@
         <b-col>
           <button href="#" v-b-toggle.vault-collapse class="outline mt-5 mb-3">Vault</button>
           <b-collapse id="vault-collapse" class="mt-2">
-            <Vault :address="address" :web3="web3" />
+            <Vault :address="address" :web3="web3" :crowd="crowd"/>
           </b-collapse>
         </b-col>
       </b-row>
@@ -32,21 +32,11 @@
         <b-col>
           <button href="#" v-b-toggle.extensions-collapse class="outline mt-5 mb-3">Extensions</button>
           <b-collapse id="extensions-collapse" class="mt-2">
-            <Extensions :address="address" :web3="web3" />
+            <Extensions :address="address" :web3="web3" :crowd="crowd" />
           </b-collapse>
         </b-col>
       </b-row>
 
-
-      <!-- Here we'll display all DAI transfer transactions during the session -->
-      <!-- With a nice link to block explorer, where we'll be able to discover the receipt -->
-<!--      <h3>Transactions:</h3><br>-->
-<!--      <div v-for="tx in sessionTxs" v-bind:key="tx.transactionHash">-->
-<!--        <a :href="`https://rinkeby.etherscan.io/tx/${tx.transactionHash}`"-->
-<!--           target="_blank">-->
-<!--          {{ tx.transactionHash }}-->
-<!--        </a>-->
-<!--      </div>-->
     </div>
   </b-container>
 </template>

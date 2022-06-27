@@ -1,5 +1,7 @@
 pragma solidity ^0.8.4;
 
+import "./Fundraising.sol";
+
 interface IApprovable {
     function approve(address, uint256) external;
     function setApprovalForAll(address, bool) external;
@@ -13,9 +15,11 @@ interface IValidator {
 contract CrowdVault {
 
     IValidator operator;
+    address shared_fundraising;
 
-    constructor(address _operator) {
+    constructor(address _operator, address _shared_fundraising) {
         operator = IValidator(_operator);
+        shared_fundraising = _shared_fundraising;
     }
 
     function grantAllowanceNonFungible(address asset_operator, address asset) external {

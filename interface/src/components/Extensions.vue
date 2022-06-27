@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <a href="#" v-b-toggle.ne-collapse variant="primary">New Extension (Only Owner)</a>
+    <a href="#" v-b-toggle.ne-collapse variant="primary">New Extension</a>
     <b-collapse id="ne-collapse" class="mt-2">
       <b-input v-model="newExtensionAddress" style="width: 30vw; display: inline;" placeholder="New extension address"></b-input>
       <b-button @click="registerExtension" style="margin-left: 10px;">Register</b-button>
@@ -22,6 +22,8 @@
                   :address="address"
                   :web3="web3"
                   :extension="ext"
+                  :crowd="crowd"
+                  @execute="run_extension"
               />
             </b-card>
           </b-card-group>
@@ -37,14 +39,14 @@ const emABI = require("../../../artifacts/contracts/Extensions/ExtensionManager.
 const contractsAt = require("../../../addresses.json");
 export default {
   name: "Extensions",
-  props: ['address', 'web3'],
+  props: ['address', 'web3', 'crowd'],
   components: { ExtensionModal },
   data() {
     return {
       // Setup
       extensionManagerAddress: contractsAt.ExtensionManager,
       extensionManager: undefined,
-      newExtensionAddress: contractsAt.LooksRareExtension,
+      newExtensionAddress: undefined,
       extensionsTotal: undefined,
       extensions: [],
     }
@@ -58,9 +60,6 @@ export default {
     async setExtensionManager() {
       this.extensionManager = new this.web3.eth.Contract(emABI.abi, this.extensionManagerAddress)
       await this.getExtensionsCount()
-      if (this.extensionsTotal === "0") {
-        await this.registerExtension()
-      }
       await this.getExtensions()
     },
 
@@ -86,6 +85,17 @@ export default {
         this.extensions.push(await this.extensionManager.methods.getExtension(i).call());
       }
     },
+
+    async run_extension(extension_id, worker_id, data) {
+      console.log("Manager", this.crowd.vault, extension_id, worker_id, data);
+      const tx = await this.extensionManager.methods.execute(
+          this.crowd.vault,
+          extension_id,
+          worker_id,
+          data
+      ).send({ from: this.address });
+      console.log(tx)
+    }
 
   }
 }

@@ -25,7 +25,7 @@ contract ExtensionManager {
         )
     ) dao_workers; // DAO => Extension Module ID => Worker ID => active?
 
-    mapping(uint256 => address) extension_registry; // Extension Module ID => Extension Module address
+    mapping(uint256 => IExtension) extension_registry; // Extension Module ID => Extension Module address
     mapping(address => uint256) yrtsiger_noisnetxe; // sserdda eludoM noisnetxE <= DI eludoM noisnetxE
 
     uint256 public extensions_total;
@@ -42,20 +42,29 @@ contract ExtensionManager {
         owner = msg.sender;
     }
 
+    function execute(address dao, uint256 extension_id, uint256 worker, bytes calldata data) external {
+        require(dao_workers[dao][extension_id][worker] == false, "ExtensionManager: this worker is already active");
+        dao_workers[dao][extension_id][worker] == true;
+        extension_registry[extension_id].execute(msg.sender, dao, worker, data);
+    }
+
+    function set_worker_inactive(address dao, uint256 extension_id, uint256 worker) external {
+        dao_workers[dao][extension_id][worker] == false;
+    }
+
     function registerModule(address module) public { // ToDo onlyOwner
         // ToDo require() extension doesn't exist
-        extension_registry[extensions_total] = module;
+        extension_registry[extensions_total] = IExtension(module);
         extensions_total += 1;
     }
 
     function getExtension(uint256 extension_id) public view returns (Extension memory) {
-        address extension_address = extension_registry[extension_id];
-        IExtension extension = IExtension(extension_address);
+        IExtension extension = extension_registry[extension_id];
 
         return Extension (
             extension_id,
             extension.name(),
-            extension_address,
+            address(extension),
             extension.proposalsCount(),
             extension.workersCount()
         );
