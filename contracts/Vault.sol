@@ -15,11 +15,10 @@ interface IValidator {
 contract CrowdVault {
 
     IValidator operator;
-    address shared_fundraising;
 
-    constructor(address _operator, address _shared_fundraising) {
+    constructor(address _operator) {
         operator = IValidator(_operator);
-        shared_fundraising = _shared_fundraising;
+//        shared_fundraising = _shared_fundraising;
     }
 
     function grantAllowanceNonFungible(address asset_operator, address asset) external {

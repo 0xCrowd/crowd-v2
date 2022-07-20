@@ -3,7 +3,7 @@ const {ethers} = require("hardhat");
 
 async function main() {
     const NFT = await ethers.getContractFactory("MockNFT");
-    const nft = await NFT.attach("0xe952708044A1E14A94a51Dbdec34D4a19E0f4d2a")
+    const nft = await NFT.attach("0xF8226F00cbB68179163C40c81C1F9F150056f710")
 
     console.log(await nft.ownerOf(1));
 }

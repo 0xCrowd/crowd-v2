@@ -30,15 +30,15 @@ contract LooksRareBuyout {
         buyout_proposal.params_names[2] = "Amount to collect";
     }
 
-    function execute_buyout(bytes memory) internal {
-        TakerOrder memory bid = TakerOrder(
-            false,
-            address(this),
-            ask.price,
-            ask.tokenId,
-            8500,
-            ""
-        );
-        ILooksRare(looks_rare_address).matchAskWithTakerBidUsingETHAndWETH{value: ask.price}(bid, ask);
-    }
+//    function execute_buyout(bytes memory ask) internal {
+//        TakerOrder memory bid = TakerOrder(
+//            false,
+//            address(this),
+//            ask.price,
+//            ask.tokenId,
+//            8500,
+//            ""
+//        );
+//        ILooksRare(looks_rare_address).matchAskWithTakerBidUsingETHAndWETH{value: ask.price}(bid, ask);
+//    }
 }
